@@ -4,7 +4,7 @@ Requirements: python + pip
 
 Installation and Run:
 
-    1. pip install -requirements.txt
+    1. pip install -r requirements.txt
 
     2. Download ta-library
         2.1 Windows installation:
