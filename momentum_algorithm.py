@@ -38,4 +38,5 @@ def logic(account, lookback):
 if __name__ == "__main__":
     backtest.start(100, logic)
     backtest.results()
-    backtest.chart()
+    backtest.chart(show_trades=True)
+    
