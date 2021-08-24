@@ -23,7 +23,7 @@ def return_resistance(asset_history, ticks):
         resistance_level    price at which a BUY recommendation is issued
                             highest price of asset over the defined number of ticks
     """
-    prices = asset_history["low"][-ticks:]
+    prices = asset_history["high"][-ticks:]
     
     resistance_level = max(prices)
     return resistance_level
