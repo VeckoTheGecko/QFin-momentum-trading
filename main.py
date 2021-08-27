@@ -12,7 +12,7 @@ from gemini_modules import engine
 df = pd.read_csv("data/USDT_BTC.csv",parse_dates=[0])
 
 #globals
-lookback_period = 6*2#*30
+lookback_period = 48*2#*30
 
 buypoints = np.array([]) #for graphing only
 sellpoints = np.array([]) #for graphing only
@@ -32,7 +32,7 @@ def logic(account, lookback):
         if today==0:
             return
 
-        if(lookback['Support'][today-1] > lookback['Support'][today]): 
+        if(lookback['Support'][today-1] > lookback['close'][today]): 
             # Close out long position
             for position in account.positions:
                 if position.type_ == 'long':
@@ -40,7 +40,7 @@ def logic(account, lookback):
                     sellpoints = np.append(sellpoints,today) #for graphing only
 
         else:
-            if(lookback['Resistance'][today-1] < lookback['Resistance'][today]):
+            if(lookback['Resistance'][today-1] < lookback['close'][today]):
                 if(account.buying_power>0):
                     # Enter long position
                     account.enter_position('long', account.buying_power, lookback['close'][today]) #use 100% of portfolio to buy
