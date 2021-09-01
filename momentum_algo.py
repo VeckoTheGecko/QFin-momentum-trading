@@ -2,6 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 from gemini_modules import engine
+import random as rand
 
 
 class BaseAlgo:
@@ -114,6 +115,95 @@ class BaseAlgo:
         plt.show()  # graph it
         return
 
+class AdaptiveWindowAlgo(BaseAlgo):
+    """This algorithm will use a window of adaptive length to calculate support and resistance
+    Window length is calculated as a function of volatility
+    """
+    def __init__(
+        self,
+        minimum_tick_width: int,
+        total_df_length: int,
+        should_plot: bool,
+        plotting_options=None,
+    ):
+        self.minimum_tick_width=minimum_tick_width
+        
+        super().__init__(total_df_length, should_plot, plotting_options)    
+        return
+
+
+    def logic(self, account: engine.exchange.Account, lookback: pd.DataFrame):
+        """Function to be passed to the backtesting module."""
+        # Just started. Skip iteration
+        current_index = len(lookback) - 1
+
+        if current_index == 0:
+            return
+
+        current_price = lookback["close"][current_index]
+        support = self.calc_support_df(lookback)[current_index - 1]
+        resistance = self.calc_resistance_df(lookback)[current_index - 1]
+
+
+        if resistance < current_price:
+            # Enter long position
+            self.enter_long(account=account, current_price=current_price)
+            self.buypoints.append(current_index)
+
+        if support > current_price:
+            # Close out all long positions
+            self.close_long(account=account, current_price=current_price)
+            self.sellpoints.append(current_index)
+            pass
+
+        # Whether to plot
+        if current_index == self.total_df_length-1 and self.should_plot:
+            self.plot(lookback=lookback)
+
+        return
+
+    def calculate_lookback_period(self, lookback: pd.DataFrame)-> float:
+        a=rand.randint(0,100)
+        #print(a)
+        return a
+
+    def calc_support_df(self, lookback: pd.DataFrame) -> float:
+        """Calculates the support df and returns it"""
+        self.lookback_period=self.calculate_lookback_period(lookback) #calculate_lookback()
+        if (self.lookback_period>len(lookback)):
+            window=len(lookback)-1
+        else:
+            window=self.lookback_period
+        support_df = lookback["low"].rolling(window=window).min()
+        return support_df
+
+    def calc_resistance_df(self, lookback: pd.DataFrame) -> float:
+        """Calculates the resistance df and returns it"""
+        self.lookback_period=self.calculate_lookback_period(lookback)
+        if (self.lookback_period>len(lookback)):
+            window=len(lookback)-1
+        else:
+            window=self.lookback_period
+        support_df = lookback["high"].rolling(window=window).max()
+        return support_df
+
+    def enter_long(self, account: engine.exchange.Account, current_price: float):
+        """Enters a long position with the whole portfolio."""
+        if account.buying_power > 0:
+            # use 100% of portfolio to buy
+            account.enter_position(
+                "long", entry_capital=account.buying_power, entry_price=current_price
+            )
+        return
+
+    def close_long(self, account: engine.exchange.Account, current_price: float):
+        """Closing all positions in the portfolio."""
+        for position in account.positions:
+            if position.type_ == "long":
+                # use 100% of portfolio to sell
+                account.close_position(position, 1, current_price)
+        return
+
 
 class FixedWindowAlgo(BaseAlgo):
     """This algorithm will use a fixed window of specified length in order to calculate support and resistance.
@@ -165,14 +255,20 @@ class FixedWindowAlgo(BaseAlgo):
 
     def calc_support_df(self, lookback: pd.DataFrame) -> float:
         """Calculates the support df and returns it"""
-
-        support_df = lookback["low"].rolling(window=self.lookback_period).min()
+        if (self.lookback_period>len(lookback)):
+            window=len(lookback)-1
+        else:
+            window=self.lookback_period
+        support_df = lookback["low"].rolling(window=window).min()
         return support_df
 
     def calc_resistance_df(self, lookback: pd.DataFrame) -> float:
         """Calculates the resistance df and returns it"""
-
-        support_df = lookback["high"].rolling(window=self.lookback_period).max()
+        if (self.lookback_period>len(lookback)):
+            window=len(lookback)-1
+        else:
+            window=self.lookback_period
+        support_df = lookback["high"].rolling(window=window).max()
         return support_df
 
     def enter_long(self, account: engine.exchange.Account, current_price: float):

@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import sys
 import breakout_lib as bl
 
-from momentum_algo import FixedWindowAlgo
+from momentum_algo import FixedWindowAlgo, AdaptiveWindowAlgo
 
 #local imports
 from gemini_modules import engine
@@ -129,8 +129,8 @@ def plotAlgorithm(lookback: pd.DataFrame, startIndex:int, size:int, settings:dic
     plt.show() #graph it
 
 if __name__ == "__main__":
-    backtest.start(100, logic=FixedWindowAlgo(
-        lookback_tick_width=20, total_df_length=len(df), should_plot=True
+    backtest.start(100, logic=AdaptiveWindowAlgo(
+        minimum_tick_width=1,total_df_length=len(df), should_plot=True
         ).logic)
     backtest.results()
     # backtest.chart(show_trades=True)
