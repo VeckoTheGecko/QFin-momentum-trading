@@ -121,12 +121,12 @@ class AdaptiveWindowAlgo(BaseAlgo):
     """
     def __init__(
         self,
-        minimum_tick_width: int,
+        volatility_tick_width: int,
         total_df_length: int,
         should_plot: bool,
         plotting_options=None,
     ):
-        self.minimum_tick_width=minimum_tick_width
+        self.volatility_tick_width=volatility_tick_width
         
         super().__init__(total_df_length, should_plot, plotting_options)    
         return
@@ -163,9 +163,18 @@ class AdaptiveWindowAlgo(BaseAlgo):
         return
 
     def calculate_lookback_period(self, lookback: pd.DataFrame)-> float:
-        a=rand.randint(0,100)
+        lookback_period=rand.randint(0,100)
+        price_df=lookback["close"].rolling(window=self.volatility_tick_width)
+        momentum=abs(price_df[0]-price_df[self.volatility_tick_width-1])
+        volatility=0
+        for i in range(len(price_df)-1):
+            volatility=volatility+abs(price_df[i+1]-price_df[i])
+        efficiency_ratio=momentum/volatility
+
+        lookback_period=int(100*efficiency_ratio)
         #print(a)
-        return a
+        return lookback_period
+    
 
     def calc_support_df(self, lookback: pd.DataFrame) -> float:
         """Calculates the support df and returns it"""
