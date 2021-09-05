@@ -28,8 +28,23 @@ def return_resistance(asset_history, ticks):
     resistance_level = max(prices)
     return resistance_level
 
-def monitor_price(asset_history):
+def algorithm_setup():
+    """
+    Initialises the portfolio variable which is updated by the algorithm_loop function.
+    """
+    return -1
+    
+def calc_order(order_type, share, portfolio):
+     """
+    Used to calculate number of shares bought
+    """
+    return -1
+
+def algorithm_loop(asset_history):
     """
     Used to manage portfolio
     """
+    #gemini.buy("ASX:asd",2)
+
     return -1
+
