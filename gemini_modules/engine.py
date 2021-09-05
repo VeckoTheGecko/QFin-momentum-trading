@@ -91,12 +91,16 @@ class backtest():
         final_price = self.data.iloc[-1]['close']
 
         pc = helpers.percent_change(being_price, final_price)
-        print("Buy and Hold : {0}%".format(round(pc*100, 2)))
-        print("Net Profit   : {0}".format(round(helpers.profit(self.account.initial_capital, pc), 2)))
+        buy_and_hold = pc*100
+        hold_net_profit = helpers.profit(self.account.initial_capital, pc)
+        print("Buy and Hold : {0}%".format(round(buy_and_hold, 2)))
+        print("Net Profit   : {0}".format(round(hold_net_profit, 2)))
         
         pc = helpers.percent_change(self.account.initial_capital, self.account.total_value(final_price))
-        print("Strategy     : {0}%".format(round(pc*100, 2)))
-        print("Net Profit   : {0}".format(round(helpers.profit(self.account.initial_capital, pc), 2)))
+        strategy = pc*100
+        strategy_net_profit = helpers.profit(self.account.initial_capital, pc)
+        print("Strategy     : {0}%".format(round(strategy, 2)))
+        print("Net Profit   : {0}".format(round(strategy_net_profit, 2)))
 
         longs  = len([t for t in self.account.opened_trades if t.type_ == 'long'])
         sells  = len([t for t in self.account.closed_trades if t.type_ == 'long'])
@@ -110,6 +114,18 @@ class backtest():
         print("--------------------")
         print("Total Trades : {0}".format(longs + sells + shorts + covers))
         print("\n---------------------------------------")
+        
+        return {
+            "buy_and_hold": buy_and_hold,
+            "hold_net_profit": hold_net_profit,
+            "strategy": strategy,
+            "strategy_net_profit": strategy_net_profit,
+            "longs": longs,
+            "sells": sells,
+            "shorts": shorts,
+            "covers": covers,
+            "total_trades": longs + sells + shorts + covers
+            }
     
     def chart(self, show_trades=False, title="Equity Curve"):
         """Chart results.

@@ -35,7 +35,7 @@ def algorithm_setup():
     return -1
     
 def calc_order(order_type, share, portfolio):
-     """
+    """
     Used to calculate number of shares bought
     """
     return -1
