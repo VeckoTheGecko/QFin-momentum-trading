@@ -4,9 +4,9 @@ import pandas as pd
 import os
 
 DATASET_FOLDER = "data"
-RESULTS_FOLDER = "mass_looping_results"
+RESULTS_FOLDER = "mass_looping_results (2days)"
 
-PLOT_FOLDER = "mass_looping_plots"
+PLOT_FOLDER = "mass_looping_plots (2days)"
 
 DATASET_NAMES = {
     "Bitcoin": "USDT_BTC.csv",
@@ -47,6 +47,7 @@ plt.title("Number of trades for different coins")
 plt.legend()
 plt.xlim(left = 0)
 plt.ylim(bottom = 0)
+plt.savefig(os.path.join(PLOT_FOLDER, "trade volumes"))
 plt.show()
 
 
