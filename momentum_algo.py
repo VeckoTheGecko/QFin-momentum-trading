@@ -1,5 +1,6 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+from talib.abstract import *
 import numpy as np
 from gemini_modules import engine
 
@@ -191,3 +192,12 @@ class FixedWindowAlgo(BaseAlgo):
                 # use 100% of portfolio to sell
                 account.close_position(position, 1, current_price)
         return
+
+if __name__=="__main__":
+    df = pd.read_csv("data/USDT_XRP.csv",parse_dates=[0])
+    backtest = engine.backtest(df)
+    backtest.start(100, logic=FixedWindowAlgo(
+        lookback_tick_width=145, total_df_length=len(df), should_plot=True
+        ).logic)
+    backtest.results()
+    # backtest.chart(show_trades=True)
